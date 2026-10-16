@@ -6,12 +6,12 @@ export class Synthesizer {
   private openai: OpenAI | null = null;
   private modelName: string;
 
-  constructor(apiKey?: string, modelName: string = "gpt-4o-mini") {
+  constructor(apiKey?: string, modelName?: string) {
     const key = apiKey || process.env.OPENAI_API_KEY;
     if (key) {
       this.openai = new OpenAI({ apiKey: key });
     }
-    this.modelName = modelName;
+    this.modelName = modelName || process.env.OPENAI_MODEL || "gpt-4o-mini";
   }
 
   /**

@@ -103,10 +103,10 @@ async function searchWikipedia(query: string, maxResults: number = 3): Promise<S
 
     if (!res.ok) return [];
 
-    const data = await res.json();
-    const titles: string[] = data[1] || [];
-    const snippets: string[] = data[2] || [];
-    const urls: string[] = data[3] || [];
+    const data = (await res.json()) as any[];
+    const titles: string[] = Array.isArray(data?.[1]) ? data[1] : [];
+    const snippets: string[] = Array.isArray(data?.[2]) ? data[2] : [];
+    const urls: string[] = Array.isArray(data?.[3]) ? data[3] : [];
 
     const results: SearchResultItem[] = [];
     for (let i = 0; i < titles.length; i++) {

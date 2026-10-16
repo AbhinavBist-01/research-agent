@@ -86,7 +86,7 @@ async function runJobBackground(job: ResearchJob) {
     tools.register(createFetchPageTool());
     tools.register(createRecordEvidenceTool(store));
 
-    const agent = new SingleAgent({ maxIterations: 5 });
+    const agent = new SingleAgent({ maxIterations: 5, modelName: "gpt-4o-mini" });
     const report = await agent.runResearch(job, tools, store);
 
     job.status = "completed";

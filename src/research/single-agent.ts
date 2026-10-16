@@ -21,7 +21,7 @@ export class SingleAgent {
     if (key) {
       this.openai = new OpenAI({ apiKey: key });
     }
-    this.modelName = options.modelName || "gpt-5.6-luna";
+    this.modelName = options.modelName || process.env.OPENAI_MODEL || "gpt-4o-mini";
     this.maxIterations = options.maxIterations || 6;
     this.synthesizer = new Synthesizer(key, this.modelName);
   }
