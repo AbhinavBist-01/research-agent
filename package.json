@@ -8,10 +8,13 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "cli": "tsx src/cli.ts",
-    "test": "tsx test/phase1.test.ts && tsx test/phase2.test.ts && tsx test/phase3.test.ts",
+    "test": "tsx test/phase1.test.ts && tsx test/phase2.test.ts && tsx test/phase3.test.ts && tsx test/phase4.test.ts && tsx test/phase5.test.ts",
     "test:phase1": "tsx test/phase1.test.ts",
     "test:phase2": "tsx test/phase2.test.ts",
-    "test:phase3": "tsx test/phase3.test.ts"
+    "test:phase3": "tsx test/phase3.test.ts",
+    "test:phase4": "tsx test/phase4.test.ts",
+    "test:phase5": "tsx test/phase5.test.ts",
+    "benchmark": "tsx test/phase5.test.ts"
   },
   "keywords": [],
   "author": "",
