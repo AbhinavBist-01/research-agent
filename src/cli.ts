@@ -8,7 +8,7 @@ import { createSearchWebTool } from "./tools/search-web.js";
 import { createFetchPageTool } from "./tools/fetch-page.js";
 import { createRecordEvidenceTool } from "./tools/record-evidence.js";
 import { EvidenceStore } from "./research/evidence-store.js";
-import { SingleAgent } from "./research/single-agent.js";
+import { Supervisor } from "./orchestration/supervisor.js";
 import type { ResearchJob, ResearchReport } from "./types.js";
 
 async function runResearchTopic(
@@ -37,8 +37,8 @@ async function runResearchTopic(
     taskIds: ["task_1"],
   };
 
-  const agent = new SingleAgent({ maxIterations: 5, modelName });
-  const report = await agent.runResearch(job, tools, store);
+  const supervisor = new Supervisor({ modelName, maxConcurrency: 3 });
+  const { report } = await supervisor.runJob(job, tools, store);
 
   console.log(`\n======================================================`);
   console.log(`📄 FINAL RESEARCH REPORT`);

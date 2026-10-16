@@ -6,7 +6,7 @@ import { createSearchWebTool } from "./tools/search-web.js";
 import { createFetchPageTool } from "./tools/fetch-page.js";
 import { createRecordEvidenceTool } from "./tools/record-evidence.js";
 import { EvidenceStore } from "./research/evidence-store.js";
-import { SingleAgent } from "./research/single-agent.js";
+import { Supervisor } from "./orchestration/supervisor.js";
 import type { ResearchJob, ResearchReport } from "./types.js";
 
 const app = express();
@@ -86,8 +86,8 @@ async function runJobBackground(job: ResearchJob) {
     tools.register(createFetchPageTool());
     tools.register(createRecordEvidenceTool(store));
 
-    const agent = new SingleAgent({ maxIterations: 5, modelName: "gpt-4o-mini" });
-    const report = await agent.runResearch(job, tools, store);
+    const supervisor = new Supervisor({ modelName: "gpt-4o-mini", maxConcurrency: 3 });
+    const { report } = await supervisor.runJob(job, tools, store);
 
     job.status = "completed";
     jobs.set(job.id, { job, report });
