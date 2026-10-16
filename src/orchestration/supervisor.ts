@@ -7,6 +7,8 @@ import type { BaseAgent } from "../agents/base-agent.js";
 import { ToolRegistry } from "../tools/registry.js";
 import { EvidenceStore } from "../research/evidence-store.js";
 import { Synthesizer } from "../research/synthesizer.js";
+import { SourceRegistry } from "../evidence/source-registry.js";
+import { CitationVerifier } from "../evidence/citation-verifier.js";
 import type { ResearchJob, ResearchReport, ResearchTask } from "../types.js";
 
 export interface SupervisorOptions {
@@ -18,6 +20,8 @@ export interface SupervisorOptions {
 export class Supervisor {
   private planner: Planner;
   private synthesizer: Synthesizer;
+  private sourceRegistry = new SourceRegistry();
+  private citationVerifier: CitationVerifier;
   private agents = new Map<string, BaseAgent>();
   private maxConcurrency: number;
 
@@ -28,6 +32,7 @@ export class Supervisor {
 
     this.planner = new Planner(key, model);
     this.synthesizer = new Synthesizer(key, model);
+    this.citationVerifier = new CitationVerifier(key, model);
 
     // Register specialized workers
     this.agents.set("web-agent", new WebAgent({ apiKey: key, modelName: model }));
@@ -94,8 +99,50 @@ export class Supervisor {
     console.log(`[Supervisor] Triggering Grounded Synthesis...`);
     const report = await this.synthesizer.synthesize(job.id, job.topic, store);
 
-    // Append Multi-Agent Execution Telemetry to Markdown
-    report.markdown += `\n\n## Multi-Agent Execution Telemetry\n`;
+    // Stage 5: 5-Level Citation Verification & Contradiction Resolution
+    job.status = "verifying";
+    console.log(`[Supervisor] 🛡️ Running 5-Level Citation Verification Pipeline...`);
+
+    // Index all captured sources in SourceRegistry
+    const sourceRegistry = new SourceRegistry();
+    for (const src of store.getAllSources()) {
+      sourceRegistry.register({
+        id: src.id,
+        url: src.url,
+        title: src.title,
+        content: src.content || "",
+        canonicalUrl: src.canonicalUrl,
+      });
+    }
+
+    const verification = await this.citationVerifier.verifyReportClaims(
+      report.claims,
+      store.getAllEvidence(),
+      sourceRegistry
+    );
+
+    // Update verified claims with audit statuses
+    report.claims = verification.verifiedClaims;
+
+    // Append Verification Audit & Multi-Agent Telemetry to Markdown
+    report.markdown += `\n\n## Citation Verification Audit\n`;
+    report.markdown += `- **Citation Precision:** ${(verification.citationPrecision * 100).toFixed(1)}%\n`;
+    report.markdown += `- **Verified Supported Claims:** ${verification.supportedClaimsCount} / ${verification.totalClaimsAudited}\n`;
+    if (verification.partiallySupportedCount > 0) {
+      report.markdown += `- **Partially Supported (Qualified):** ${verification.partiallySupportedCount}\n`;
+    }
+    if (verification.unsupportedClaimsCount > 0) {
+      report.markdown += `- **Unsupported Claims Flagged:** ${verification.unsupportedClaimsCount}\n`;
+    }
+
+    if (verification.contradictions.length > 0) {
+      report.markdown += `\n### Empirical Contradictions & Nuance\n`;
+      for (const cr of verification.contradictions) {
+        report.markdown += `- **[${cr.conflictingClaimIds.join(" vs ")}]:** ${cr.resolution}\n`;
+      }
+    }
+
+    report.markdown += `\n## Multi-Agent Execution Telemetry\n`;
     report.markdown += `- **Execution Mode:** Supervised Bounded DAG Concurrency (max ${this.maxConcurrency})\n`;
     report.markdown += `- **Execution Duration:** ${(graphSummary.durationMs / 1000).toFixed(2)}s\n`;
     report.markdown += `- **Tasks Completed:** ${graphSummary.completedTasks.length} / ${graphSummary.totalTasks}\n`;

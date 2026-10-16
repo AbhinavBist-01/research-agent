@@ -8,9 +8,10 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "cli": "tsx src/cli.ts",
-    "test": "tsx test/phase1.test.ts && tsx test/phase2.test.ts",
+    "test": "tsx test/phase1.test.ts && tsx test/phase2.test.ts && tsx test/phase3.test.ts",
     "test:phase1": "tsx test/phase1.test.ts",
-    "test:phase2": "tsx test/phase2.test.ts"
+    "test:phase2": "tsx test/phase2.test.ts",
+    "test:phase3": "tsx test/phase3.test.ts"
   },
   "keywords": [],
   "author": "",

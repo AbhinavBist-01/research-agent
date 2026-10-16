@@ -40,7 +40,7 @@ Instructions:
           {
             sourceUrl: item.url,
             sourceTitle: item.title,
-            claim: `Architectural analysis: ${item.title}`,
+            claim: item.title,
             excerpt: item.content,
           },
           { jobId: context.jobId, taskId: context.task.id }
