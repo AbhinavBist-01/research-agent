@@ -14,8 +14,7 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// In-memory job repository for Phase 1
-const jobs = new Map<string, { job: ResearchJob; report?: ResearchReport }>();
+const supervisor = new Supervisor({ modelName: "gpt-4o-mini", maxConcurrency: 3 });
 
 // 1. Health check
 app.get("/health", (_req: Request, res: Response) => {
@@ -42,9 +41,10 @@ app.post("/research", async (req: Request, res: Response) => {
     taskIds: ["task_1"],
   };
 
-  jobs.set(jobId, { job });
+  // Persist to Drizzle repository
+  await supervisor.getRepository().saveJob(job);
 
-  // In Phase 1 prototype, we execute asynchronously in-process
+  // Execute asynchronously
   runJobBackground(job);
 
   res.status(202).json({
@@ -55,7 +55,7 @@ app.post("/research", async (req: Request, res: Response) => {
 });
 
 // 3. Poll Research Job (GET /research/:jobId)
-app.get("/research/:jobId", (req: Request, res: Response) => {
+app.get("/research/:jobId", async (req: Request, res: Response) => {
   const jobId = Array.isArray(req.params.jobId) ? req.params.jobId[0] : req.params.jobId;
 
   if (!jobId) {
@@ -63,22 +63,41 @@ app.get("/research/:jobId", (req: Request, res: Response) => {
     return;
   }
 
-  const entry = jobs.get(jobId);
-
-  if (!entry) {
+  const job = await supervisor.getRepository().getJob(jobId);
+  if (!job) {
     res.status(404).json({ error: `Job with ID '${jobId}' not found.` });
     return;
   }
 
+  const report = await supervisor.getRepository().getReport(jobId);
+  const runs = await supervisor.getRepository().getRunsForJob(jobId);
+
   res.json({
-    job: entry.job,
-    report: entry.report || null,
+    job,
+    report: report || null,
+    runs,
   });
+});
+
+// 4. Cancel Research Job (POST /research/:jobId/cancel)
+app.post("/research/:jobId/cancel", (req: Request, res: Response) => {
+  const jobId = Array.isArray(req.params.jobId) ? req.params.jobId[0] : req.params.jobId;
+
+  if (!jobId) {
+    res.status(400).json({ error: "Missing jobId in request parameters." });
+    return;
+  }
+
+  const cancelled = supervisor.cancelJob(jobId);
+  if (cancelled) {
+    res.json({ jobId, status: "cancelled", message: "Job cancelled successfully." });
+  } else {
+    res.status(404).json({ error: `Job '${jobId}' is not actively running or not found.` });
+  }
 });
 
 async function runJobBackground(job: ResearchJob) {
   try {
-    job.status = "researching";
     const store = new EvidenceStore();
     const tools = new ToolRegistry();
 
@@ -86,16 +105,10 @@ async function runJobBackground(job: ResearchJob) {
     tools.register(createFetchPageTool());
     tools.register(createRecordEvidenceTool(store));
 
-    const supervisor = new Supervisor({ modelName: "gpt-4o-mini", maxConcurrency: 3 });
-    const { report } = await supervisor.runJob(job, tools, store);
-
-    job.status = "completed";
-    jobs.set(job.id, { job, report });
+    await supervisor.runJob(job, tools, store);
     console.log(`[Server] Job ${job.id} completed successfully.`);
   } catch (err: any) {
-    job.status = "failed";
-    console.error(`[Server] Job ${job.id} failed:`, err);
-    jobs.set(job.id, { job });
+    console.error(`[Server] Job ${job.id} error:`, err?.message || err);
   }
 }
 
