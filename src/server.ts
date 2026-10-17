@@ -13,6 +13,17 @@ import type { ResearchJob } from "./types.js";
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use((_req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (_req.method === "OPTIONS") {
+    res.sendStatus(204);
+    return;
+  }
+  next();
+});
+
 app.use(express.json());
 // Serve static assets from public/
 app.use(express.static(path.resolve(process.cwd(), "public")));

@@ -1,1789 +1,1018 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BOSS 7 // Autonomous Multi-Agent Research System</title>
-  
-  <!-- Fonts -->
+  <title>Deep Research</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <!-- Markdown Renderer -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
   <style>
     :root {
-      --bg-base: #09090b;
-      --bg-surface: #121214;
-      --bg-card: #18181b;
-      --bg-subtle: #202024;
-      --bg-hover: #27272a;
-      
-      --border-subtle: #27272a;
-      --border-muted: #3f3f46;
-      --border-focus: #71717a;
-
-      --text-primary: #f4f4f5;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
+      --bg: #09090b;
+      --surface: #111113;
+      --elevated: #18181b;
+      --border: #222226;
+      --border-focus: #3f3f46;
+      --text: #f4f4f5;
+      --text-muted: #8b8b93;
       --text-dim: #52525b;
-
-      --accent-white: #ffffff;
-      --accent-cyan: #38bdf8;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-crimson: #ef4444;
-      --accent-violet: #a855f7;
-
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      --font-mono: 'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --emerald: #10b981;
+      --sky: #38bdf8;
+      --rose: #f43f5e;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      min-height: 100vh;
-      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      height: 100vh;
       display: flex;
       flex-direction: column;
-      font-size: 13.5px;
-      line-height: 1.5;
+      overflow: hidden;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--bg-base);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-subtle);
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--border-muted);
-    }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
 
-    /* Top Navigation Header */
+    /* Header */
     header {
-      height: 52px;
-      background: rgba(18, 18, 20, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-subtle);
+      height: 46px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      padding: 0 16px;
+      flex-shrink: 0;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .brand-logo {
-      width: 26px;
-      height: 26px;
-      background: #ffffff;
-      color: #000000;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      letter-spacing: -0.5px;
-    }
-
-    .brand-name {
+      gap: 10px;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 13px;
       letter-spacing: -0.2px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
-    .brand-tag {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
-      padding: 2px 7px;
-      border-radius: 4px;
-    }
-
-    .header-center {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .engine-status-badge {
-      display: flex;
+    .badge {
+      display: inline-flex;
       align-items: center;
       gap: 6px;
       font-family: var(--font-mono);
       font-size: 11px;
-      padding: 4px 10px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 12px;
-      color: var(--text-secondary);
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
     }
 
-    .status-dot {
-      width: 7px;
-      height: 7px;
+    .dot {
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
-      background: var(--accent-emerald);
-      box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+      background: var(--text-dim);
     }
-    .status-dot.active {
-      background: var(--accent-cyan);
-      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+    .dot.live {
+      background: var(--sky);
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
       animation: pulse 1.8s infinite;
     }
-    .status-dot.cancelled {
-      background: var(--accent-crimson);
-      box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
-    }
+    .dot.done { background: var(--emerald); }
+    .dot.cancelled { background: var(--rose); }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 0.35; transform: scale(0.85); }
     }
 
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    /* Main Container Layout */
-    .app-layout {
+    /* Layout */
+    .app {
+      flex: 1;
       display: grid;
-      grid-template-columns: 1fr 440px;
-      height: calc(100vh - 52px);
+      grid-template-columns: 1fr 340px;
       overflow: hidden;
     }
 
-    @media (max-width: 1080px) {
-      .app-layout {
-        grid-template-columns: 1fr;
-        height: auto;
-        overflow: visible;
-      }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 1fr; }
+      aside { display: none; }
     }
 
-    /* Left Section: Chat & Synthesized Report */
-    .main-workspace {
+    /* Main Workspace */
+    main {
       display: flex;
       flex-direction: column;
       height: 100%;
-      border-right: 1px solid var(--border-subtle);
-      background: var(--bg-base);
+      border-right: 1px solid var(--border);
+      background: var(--bg);
       overflow: hidden;
     }
 
-    /* View Mode Tabs */
-    .workspace-header {
-      padding: 10px 16px;
-      border-bottom: 1px solid var(--border-subtle);
+    .subnav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--bg-surface);
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
     }
 
-    .view-toggle {
+    .tabs {
       display: flex;
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
+      gap: 2px;
+      background: var(--bg);
       padding: 2px;
       border-radius: 6px;
-      gap: 2px;
+      border: 1px solid var(--border);
     }
 
-    .toggle-btn {
+    .tab {
       background: transparent;
       border: none;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       font-size: 12px;
       font-weight: 500;
-      padding: 5px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
-    }
-
-    .toggle-btn:hover {
-      color: var(--text-primary);
-    }
-
-    .toggle-btn.active {
-      background: var(--bg-card);
-      color: var(--accent-white);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    }
-
-    .report-actions {
-      display: flex;
-      gap: 6px;
-    }
-
-    /* Chat / Report Area */
-    .workspace-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      position: relative;
-    }
-
-    /* Chat Messages */
-    .message-container {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 860px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    .message-bubble {
-      display: flex;
-      gap: 12px;
-      animation: fadeIn 0.25s ease-out forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 600;
-      flex-shrink: 0;
-    }
-
-    .avatar.user {
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-muted);
-      color: var(--text-primary);
-    }
-
-    .avatar.assistant {
-      background: #ffffff;
-      color: #000000;
-    }
-
-    .message-body {
-      flex: 1;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 14px 16px;
-    }
-
-    .message-meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      font-size: 11.5px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-    }
-
-    /* Stage Progression Tracker */
-    .pipeline-stage-tracker {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      margin-bottom: 12px;
-      overflow-x: auto;
-    }
-
-    .stage-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11.5px;
-      font-family: var(--font-mono);
-      color: var(--text-dim);
-      white-space: nowrap;
-    }
-
-    .stage-item.completed {
-      color: var(--accent-emerald);
-    }
-
-    .stage-item.active {
-      color: var(--accent-cyan);
-      font-weight: 600;
-    }
-
-    .stage-separator {
-      color: var(--border-muted);
-      font-size: 10px;
-    }
-
-    /* Activity Stream Logs */
-    .activity-log {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 10px 12px;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-
-    .log-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      line-height: 1.4;
-    }
-
-    .log-time {
-      color: var(--text-dim);
-      flex-shrink: 0;
-    }
-
-    .log-tag {
-      padding: 1px 4px;
-      border-radius: 3px;
-      font-size: 10px;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .log-tag.plan { background: rgba(168, 85, 247, 0.15); color: var(--accent-violet); }
-    .log-tag.task { background: rgba(56, 189, 248, 0.15); color: var(--accent-cyan); }
-    .log-tag.verify { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
-    .log-tag.cancel { background: rgba(239, 68, 68, 0.15); color: var(--accent-crimson); }
-
-    .log-msg {
-      color: var(--text-secondary);
-      word-break: break-all;
-    }
-
-    /* Rendered Markdown Styling */
-    .markdown-view {
-      color: var(--text-primary);
-      line-height: 1.7;
-      font-size: 13.5px;
-    }
-
-    .markdown-view h1,
-    .markdown-view h2,
-    .markdown-view h3,
-    .markdown-view h4 {
-      color: #ffffff;
-      font-weight: 600;
-      margin-top: 24px;
-      margin-bottom: 10px;
-      letter-spacing: -0.2px;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 6px;
-    }
-
-    .markdown-view h1 { font-size: 20px; }
-    .markdown-view h2 { font-size: 16px; }
-    .markdown-view h3 { font-size: 14px; border-bottom: none; }
-
-    .markdown-view p {
-      margin-bottom: 14px;
-      color: #d4d4d8;
-    }
-
-    .markdown-view ul, .markdown-view ol {
-      margin-left: 20px;
-      margin-bottom: 14px;
-      color: #d4d4d8;
-    }
-
-    .markdown-view li {
-      margin-bottom: 4px;
-    }
-
-    .markdown-view strong {
-      color: #ffffff;
-      font-weight: 600;
-    }
-
-    .markdown-view code {
-      font-family: var(--font-mono);
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-subtle);
-      padding: 2px 5px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #e4e4e7;
-    }
-
-    .markdown-view pre {
-      background: #0d0d0e;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 14px;
-      overflow-x: auto;
-      margin-bottom: 16px;
-    }
-
-    .markdown-view pre code {
-      background: transparent;
-      border: none;
-      padding: 0;
-      color: #e4e4e7;
-    }
-
-    .markdown-view blockquote {
-      border-left: 3px solid var(--border-muted);
-      padding-left: 14px;
-      color: var(--text-secondary);
-      margin-bottom: 14px;
-      font-style: italic;
-    }
-
-    .markdown-view table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 16px 0;
-      font-size: 12.5px;
-    }
-
-    .markdown-view th, .markdown-view td {
-      border: 1px solid var(--border-subtle);
-      padding: 8px 12px;
-      text-align: left;
-    }
-
-    .markdown-view th {
-      background: var(--bg-card);
-      color: #ffffff;
-      font-weight: 600;
-    }
-
-    /* Citation Badges in Report */
-    .cite-pill {
-      display: inline-flex;
-      align-items: center;
-      padding: 1px 6px;
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: 600;
-      background: rgba(56, 189, 248, 0.12);
-      color: var(--accent-cyan);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      border-radius: 4px;
-      margin: 0 2px;
-      cursor: pointer;
-      text-decoration: none;
-      vertical-align: baseline;
-    }
-    .cite-pill:hover {
-      background: rgba(56, 189, 248, 0.25);
-    }
-
-    /* Bottom Chat Input Form */
-    .workspace-footer {
-      padding: 16px 20px;
-      background: var(--bg-surface);
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .quick-prompts {
-      display: flex;
-      gap: 8px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-    }
-
-    .quick-pill {
-      font-size: 11px;
-      font-family: var(--font-sans);
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-secondary);
       padding: 4px 10px;
-      border-radius: 12px;
+      border-radius: 4px;
       cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease;
     }
-    .quick-pill:hover {
-      background: var(--bg-hover);
-      color: var(--text-primary);
-      border-color: var(--border-muted);
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 10px 14px;
-      transition: border-color 0.15s ease;
-    }
-
-    .input-wrapper:focus-within {
-      border-color: var(--border-focus);
-    }
-
-    .research-input {
-      background: transparent;
-      border: none;
-      color: var(--text-primary);
-      font-family: var(--font-sans);
-      font-size: 13.5px;
-      resize: none;
-      outline: none;
-      min-height: 48px;
-      max-height: 120px;
-      line-height: 1.5;
-    }
-
-    .input-toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .toolbar-hints {
-      font-size: 11px;
-      color: var(--text-dim);
-      font-family: var(--font-mono);
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .tab:hover { color: var(--text); }
+    .tab.active {
+      background: var(--elevated);
+      color: var(--text);
     }
 
     .btn {
-      background: var(--bg-card);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-      font-family: var(--font-sans);
-      font-size: 12px;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      font-size: 11.5px;
       font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 6px;
+      padding: 4px 9px;
+      border-radius: 4px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      transition: all 0.15s ease;
+      gap: 4px;
     }
+    .btn:hover { background: var(--elevated); border-color: var(--border-focus); }
+    .btn-solid { background: #ffffff; color: #000000; border-color: #ffffff; font-weight: 600; }
+    .btn-solid:hover:not(:disabled) { background: #e4e4e7; }
+    .btn-danger { color: var(--rose); border-color: rgba(244, 63, 94, 0.25); }
+    .btn-danger:hover { background: rgba(244, 63, 94, 0.08); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    .btn:hover {
-      background: var(--bg-hover);
-      border-color: var(--border-muted);
-    }
-
-    .btn:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .btn.btn-primary {
-      background: #ffffff;
-      color: #000000;
-      border: 1px solid #ffffff;
-      font-weight: 600;
-    }
-
-    .btn.btn-primary:hover:not(:disabled) {
-      background: #e4e4e7;
-    }
-
-    .btn.btn-danger {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--accent-crimson);
-      border: 1px solid rgba(239, 68, 68, 0.25);
-    }
-
-    .btn.btn-danger:hover:not(:disabled) {
-      background: rgba(239, 68, 68, 0.2);
-    }
-
-    /* Right Section: Telemetry, DAG Orchestration & Sources */
-    .telemetry-sidebar {
-      background: var(--bg-surface);
-      height: 100%;
+    /* Content */
+    .viewport {
+      flex: 1;
       overflow-y: auto;
+      padding: 20px 24px;
       display: flex;
       flex-direction: column;
-      padding: 16px;
-      gap: 18px;
+      gap: 16px;
     }
 
-    .sidebar-section-title {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 740px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+    .card.user {
+      background: var(--elevated);
+    }
+
+    .card-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-dim);
+      margin-bottom: 6px;
     }
 
-    /* 4-Card Telemetry Grid */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .metric-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 12px 14px;
+    .stream {
+      background: #000000;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      max-height: 150px;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 4px;
     }
+    .stream-row { display: flex; gap: 8px; line-height: 1.4; }
+    .stream-row .t { color: var(--text-dim); flex-shrink: 0; }
+    .stream-row .m { color: var(--text-muted); }
 
-    .metric-label {
-      font-size: 11px;
-      color: var(--text-muted);
-      font-family: var(--font-mono);
+    /* Markdown */
+    .markdown-view {
+      max-width: 780px;
+      margin: 0 auto;
+      width: 100%;
+      color: #d4d4d8;
+      line-height: 1.7;
+      font-size: 13.5px;
     }
-
-    .metric-val {
-      font-size: 18px;
-      font-weight: 700;
-      font-family: var(--font-mono);
+    .markdown-view h1, .markdown-view h2, .markdown-view h3 {
       color: #ffffff;
-      letter-spacing: -0.5px;
+      font-weight: 600;
+      margin: 20px 0 8px;
     }
-
-    .metric-sub {
-      font-size: 10.5px;
-      color: var(--text-dim);
+    .markdown-view h1 { font-size: 18px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+    .markdown-view h2 { font-size: 14.5px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+    .markdown-view p { margin-bottom: 12px; }
+    .markdown-view ul, .markdown-view ol { margin: 0 0 12px 18px; }
+    .markdown-view li { margin-bottom: 3px; }
+    .markdown-view code {
       font-family: var(--font-mono);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 11.5px;
+      color: #e4e4e7;
     }
-
-    /* Multi-Agent DAG Task Graph View */
-    .task-graph-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .task-item {
-      background: var(--bg-base);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
+    .markdown-view pre {
+      background: #000000;
+      border: 1px solid var(--border);
       padding: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      transition: all 0.15s ease;
+      border-radius: 5px;
+      overflow-x: auto;
+      margin: 10px 0;
     }
+    .markdown-view pre code { border: none; background: transparent; padding: 0; }
+    .markdown-view table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 12px; }
+    .markdown-view th, .markdown-view td { border: 1px solid var(--border); padding: 6px 8px; text-align: left; }
+    .markdown-view th { background: var(--surface); color: #ffffff; }
 
-    .task-item.running {
-      border-color: rgba(56, 189, 248, 0.4);
-      background: rgba(56, 189, 248, 0.03);
-    }
-
-    .task-item.completed {
-      border-color: rgba(16, 185, 129, 0.3);
-    }
-
-    .task-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .task-id-badge {
-      font-family: var(--font-mono);
-      font-size: 10.5px;
-      font-weight: 600;
-      color: var(--text-secondary);
-    }
-
-    .agent-pill {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-muted);
-      color: var(--text-secondary);
-    }
-
-    .agent-pill.papers-agent {
-      color: var(--accent-violet);
-      border-color: rgba(168, 85, 247, 0.3);
-      background: rgba(168, 85, 247, 0.08);
-    }
-    .agent-pill.web-agent {
-      color: var(--accent-cyan);
-      border-color: rgba(56, 189, 248, 0.3);
-      background: rgba(56, 189, 248, 0.08);
-    }
-    .agent-pill.research-agent {
-      color: var(--accent-emerald);
-      border-color: rgba(16, 185, 129, 0.3);
-      background: rgba(16, 185, 129, 0.08);
-    }
-
-    .task-status-pill {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      text-transform: uppercase;
-      font-weight: 600;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-
-    .task-status-pill.pending {
-      color: var(--text-dim);
-      background: var(--bg-subtle);
-    }
-
-    .task-status-pill.running {
-      color: var(--accent-cyan);
-      background: rgba(56, 189, 248, 0.15);
-      animation: pulse 1.5s infinite;
-    }
-
-    .task-status-pill.completed {
-      color: var(--accent-emerald);
-      background: rgba(16, 185, 129, 0.15);
-    }
-
-    .task-status-pill.failed {
-      color: var(--accent-crimson);
-      background: rgba(239, 68, 68, 0.15);
-    }
-
-    .task-desc {
-      font-size: 12px;
-      color: var(--text-secondary);
-      line-height: 1.4;
-    }
-
-    .task-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--text-dim);
-    }
-
-    /* Discovered Sources & Evidence Registry */
-    .source-list {
+    /* Input Dock */
+    footer {
+      padding: 12px 18px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-height: 240px;
-      overflow-y: auto;
     }
 
-    .source-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 10px;
+    .chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+    }
+    .chip {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .chip:hover { color: var(--text); border-color: var(--border-focus); }
+
+    .input-wrap {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+    .input-wrap:focus-within { border-color: var(--border-focus); }
+
+    textarea {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      resize: none;
+      min-height: 38px;
+      max-height: 100px;
+      line-height: 1.45;
     }
 
-    .source-title {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .dock-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
     }
 
-    .source-meta {
+    /* Sidebar */
+    aside {
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      padding: 14px;
+      gap: 14px;
+    }
+
+    .side-label {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .grid-2x2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .tile {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .tile-lbl { font-family: var(--font-mono); font-size: 9.5px; color: var(--text-dim); }
+    .tile-val { font-family: var(--font-mono); font-size: 15px; font-weight: 600; color: #ffffff; }
+    .tile-sub { font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); }
+
+    /* Task Rows */
+    .task-rows { display: flex; flex-direction: column; gap: 5px; }
+    .task-r {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 6px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .task-r.running { border-color: rgba(56, 189, 248, 0.4); }
+    .task-r.completed { border-color: rgba(16, 185, 129, 0.25); }
+
+    .task-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--text-dim);
+      font-size: 9.5px;
     }
-
-    .source-hash {
-      color: var(--text-muted);
+    .task-pill {
+      font-size: 8.5px;
+      text-transform: uppercase;
+      padding: 1px 4px;
+      border-radius: 2px;
     }
+    .task-pill.pending { color: var(--text-dim); background: var(--surface); }
+    .task-pill.running { color: var(--sky); background: rgba(56, 189, 248, 0.12); }
+    .task-pill.completed { color: var(--emerald); background: rgba(16, 185, 129, 0.12); }
+    .task-pill.failed { color: var(--rose); background: rgba(244, 63, 94, 0.12); }
 
-    /* Past Jobs / Session History Drawer */
-    .history-list {
+    .task-text { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+
+    /* List Containers */
+    .scroll-box {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      max-height: 160px;
+      gap: 4px;
+      max-height: 150px;
       overflow-y: auto;
     }
 
-    .history-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 8px 10px;
+    .hist-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 5px 7px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      transition: all 0.15s ease;
+      font-size: 11px;
     }
+    .hist-item:hover { border-color: var(--border-focus); background: var(--elevated); }
+    .hist-topic { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; color: var(--text-muted); }
 
-    .history-card:hover {
-      background: var(--bg-hover);
-      border-color: var(--border-muted);
-    }
-
-    .history-topic {
-      font-size: 11.5px;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 260px;
-    }
-
-    .history-time {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--text-dim);
-    }
-
-    /* Empty States */
-    .empty-state {
-      padding: 30px 20px;
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* Hidden Utility */
-    .hidden {
-      display: none !important;
-    }
+    .note { font-size: 10.5px; color: var(--text-dim); padding: 4px 0; text-align: center; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- Top Navigation Header -->
+  <!-- Minimal Header -->
   <header>
     <div class="brand">
-      <div class="brand-logo">B7</div>
-      <div class="brand-name">
-        BOSS 7
-        <span class="brand-tag">Deep Research OS</span>
+      <span>Research</span>
+      <div class="badge">
+        <span id="dot" class="dot"></span>
+        <span id="status">Ready</span>
       </div>
     </div>
 
-    <div class="header-center">
-      <div id="engineStatusBadge" class="engine-status-badge">
-        <span id="engineStatusDot" class="status-dot"></span>
-        <span id="engineStatusText">SYSTEM IDLE</span>
-      </div>
-      <div id="activeJobPill" class="brand-tag hidden">
-        Job: <span id="activeJobIdText">none</span>
-      </div>
-    </div>
-
-    <div class="header-actions">
-      <button id="cancelJobBtn" class="btn btn-danger hidden" onclick="cancelCurrentJob()">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-        Cancel Research
-      </button>
-      <div class="brand-tag">
-        Drizzle ORM · gpt-4o-mini
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button id="cancelBtn" class="btn btn-danger hidden" onclick="cancelJob()">Cancel</button>
+      <div id="jobBadge" class="badge hidden">
+        <span id="jobId"></span>
       </div>
     </div>
   </header>
 
-  <!-- App Body Layout -->
-  <main class="app-layout">
-
-    <!-- Left Workspace: Chat, Progress, and Verified Synthesis -->
-    <section class="main-workspace">
-      
-      <!-- Workspace View Toggle & Report Controls -->
-      <div class="workspace-header">
-        <div class="view-toggle">
-          <button id="tabChatBtn" class="toggle-btn active" onclick="switchView('chat')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            Interactive Chat & Stream
-          </button>
-          <button id="tabReportBtn" class="toggle-btn" onclick="switchView('report')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-            Synthesized Report
-          </button>
+  <div class="app">
+    <!-- Main Workspace -->
+    <main>
+      <div class="subnav">
+        <div class="tabs">
+          <button id="tabChat" class="tab active" onclick="switchView('chat')">Timeline</button>
+          <button id="tabReport" class="tab" onclick="switchView('report')">Report</button>
         </div>
 
-        <div id="reportActions" class="report-actions hidden">
-          <button class="btn" onclick="copyReportMarkdown()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            Copy Markdown
-          </button>
-          <button class="btn" onclick="downloadReportMarkdown()">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Download .md
-          </button>
+        <div id="reportActions" class="hidden" style="display: flex; gap: 6px;">
+          <button class="btn" onclick="copyMarkdown()">Copy</button>
+          <button class="btn" onclick="downloadMarkdown()">Download</button>
         </div>
       </div>
 
-      <!-- Workspace Content Area -->
-      <div id="workspaceContent" class="workspace-content">
-
-        <!-- Stage Progression Visualizer -->
-        <div id="pipelineTracker" class="pipeline-stage-tracker hidden">
-          <div class="stage-item" id="stage_queued">● Queued</div>
-          <div class="stage-separator">→</div>
-          <div class="stage-item" id="stage_planning">● Planning</div>
-          <div class="stage-separator">→</div>
-          <div class="stage-item" id="stage_researching">● Parallel DAG</div>
-          <div class="stage-separator">→</div>
-          <div class="stage-item" id="stage_synthesizing">● Synthesis</div>
-          <div class="stage-separator">→</div>
-          <div class="stage-item" id="stage_verifying">● Citation Audit</div>
-          <div class="stage-separator">→</div>
-          <div class="stage-item" id="stage_completed">● Report Ready</div>
-        </div>
-
-        <!-- Chat Conversation Messages -->
-        <div id="chatMessageThread" class="message-container">
-          <!-- Initial Welcome Message -->
-          <div class="message-bubble">
-            <div class="avatar assistant">B7</div>
-            <div class="message-body">
-              <div class="message-meta">
-                <span>SUPERVISOR AGENT · READY</span>
-                <span>SYSTEM</span>
-              </div>
-              <p style="color: #e4e4e7; margin-bottom: 8px;">
-                Welcome to <strong>BOSS 7</strong>. I am your autonomous multi-agent research supervisor.
-              </p>
-              <p style="color: var(--text-secondary); font-size: 13px;">
-                Enter any technical topic, architectural dilemma, or comparative benchmark question below.
-                I will decompose your inquiry into specialized tasks, dispatch bounded parallel agents (Web, Papers, Research), extract source-grounded evidence with SHA-256 hashes, and audit every claim via our 5-level citation pipeline.
-              </p>
+      <div id="viewport" class="viewport">
+        <!-- Chat Flow -->
+        <div id="chatFlow" class="flow">
+          <div class="card">
+            <div class="card-head">
+              <span>SYSTEM</span>
             </div>
+            <p style="color: var(--text-muted);">
+              Enter a research inquiry to initiate bounded parallel agent retrieval, source grounding, and audited synthesis.
+            </p>
           </div>
         </div>
 
-        <!-- Synthesized Report Container (Toggled via tab) -->
-        <div id="reportMarkdownContainer" class="markdown-view hidden">
-          <!-- Markdown content injected dynamically -->
-        </div>
-
+        <!-- Markdown Report Flow -->
+        <div id="reportFlow" class="markdown-view hidden"></div>
       </div>
 
-      <!-- Workspace Footer Input Form -->
-      <footer class="workspace-footer">
-        
-        <!-- Quick Suggested Prompt Pills -->
-        <div class="quick-prompts">
-          <span style="font-size: 11px; color: var(--text-dim); display: flex; align-items: center; margin-right: 4px;">Suggestions:</span>
-          <div class="quick-pill" onclick="populatePrompt('Continuous batching in LLM inference and how it compares with static batching')">Continuous vs Static Batching</div>
-          <div class="quick-pill" onclick="populatePrompt('FlashAttention-3 FP8 tensor core optimizations and memory bandwidth savings')">FlashAttention-3 FP8</div>
-          <div class="quick-pill" onclick="populatePrompt('Speculative decoding speedups, verification overhead, and acceptance rate bounds')">Speculative Decoding</div>
-          <div class="quick-pill" onclick="populatePrompt('Mixture of Experts routing strategies and expert load balancing algorithms')">MoE Routing & Load Balancing</div>
+      <footer>
+        <div class="chips">
+          <span style="font-size: 10px; color: var(--text-dim); align-self: center;">Examples:</span>
+          <div class="chip" onclick="setPrompt('Continuous batching in LLM inference vs static batching')">Continuous vs Static Batching</div>
+          <div class="chip" onclick="setPrompt('FlashAttention-3 FP8 tensor core optimizations and memory bounds')">FlashAttention-3 FP8</div>
+          <div class="chip" onclick="setPrompt('Speculative decoding acceptance rates, latency, and memory bounds')">Speculative Decoding</div>
+          <div class="chip" onclick="setPrompt('Mixture of Experts routing and expert load balancing algorithms')">MoE Load Balancing</div>
         </div>
 
-        <!-- Input Box -->
-        <div class="input-wrapper">
+        <div class="input-wrap">
           <textarea
-            id="researchTopicInput"
-            class="research-input"
-            placeholder="Ask a technical topic (e.g. 'Compare speculative decoding with continuous batching in vLLM serving')..."
+            id="topicInput"
+            placeholder="Ask a technical research question..."
             rows="2"
-            onkeydown="handleInputKeydown(event)"
+            onkeydown="onKey(event)"
           ></textarea>
-          
-          <div class="input-toolbar">
-            <div class="toolbar-hints">
-              <span>Press <kbd style="background: var(--bg-card); border: 1px solid var(--border-muted); padding: 1px 4px; border-radius: 3px;">Enter ↵</kbd> to deploy</span>
-              <span>• Parallel DAG (max 3x)</span>
-              <span>• Zero-Key Web Search</span>
-            </div>
 
-            <button id="submitJobBtn" class="btn btn-primary" onclick="submitResearchJob()">
-              Deploy Agents
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-            </button>
+          <div class="dock-foot">
+            <span style="font-family: var(--font-mono); font-size: 10px; color: var(--text-dim);">↵ Enter to run</span>
+            <button id="runBtn" class="btn btn-solid" onclick="runResearch()">Run</button>
           </div>
         </div>
       </footer>
+    </main>
 
-    </section>
-
-
-    <!-- Right Sidebar: Live Telemetry & Multi-Agent DAG Control Center -->
-    <aside class="telemetry-sidebar">
-      
-      <!-- Telemetry Cards -->
+    <!-- Sidebar -->
+    <aside>
       <div>
-        <div class="sidebar-section-title">
-          <span>Real-time Telemetry</span>
-          <span id="telemetryStatus" style="font-family: var(--font-mono); font-size: 10px; color: var(--accent-emerald);">LIVE</span>
+        <div class="side-label">
+          <span>Telemetry</span>
+          <span style="font-size: 9px;">3x DAG</span>
         </div>
-        
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-label">Tokens Consumed</div>
-            <div id="statTokens" class="metric-val">0</div>
-            <div id="statTokensDetail" class="metric-sub">0 in / 0 out</div>
+        <div class="grid-2x2">
+          <div class="tile">
+            <div class="tile-lbl">Tokens</div>
+            <div id="statTokens" class="tile-val">0</div>
+            <div id="statTokensSplit" class="tile-sub">0 in / 0 out</div>
           </div>
-
-          <div class="metric-card">
-            <div class="metric-label">Estimated Cost</div>
-            <div id="statCost" class="metric-val">$0.000</div>
-            <div class="metric-sub">OpenAI gpt-4o-mini</div>
+          <div class="tile">
+            <div class="tile-lbl">Est. Cost</div>
+            <div id="statCost" class="tile-val">$0.000</div>
+            <div class="tile-sub">USD</div>
           </div>
-
-          <div class="metric-card">
-            <div class="metric-label">Execution Duration</div>
-            <div id="statDuration" class="metric-val">0.0s</div>
-            <div id="statConcurrency" class="metric-sub">DAG Concurrency: 3</div>
+          <div class="tile">
+            <div class="tile-lbl">Duration</div>
+            <div id="statDuration" class="tile-val">0.0s</div>
+            <div class="tile-sub">Elapsed</div>
           </div>
-
-          <div class="metric-card">
-            <div class="metric-label">Citation Precision</div>
-            <div id="statPrecision" class="metric-val">100%</div>
-            <div id="statPrecisionSub" class="metric-sub">Level 1-5 Verified</div>
+          <div class="tile">
+            <div class="tile-lbl">Precision</div>
+            <div id="statPrecision" class="tile-val">100%</div>
+            <div id="statPrecisionSub" class="tile-sub">Grounding</div>
           </div>
         </div>
       </div>
 
-      <!-- Multi-Agent DAG Tasks -->
       <div>
-        <div class="sidebar-section-title">
-          <span>Multi-Agent Task Graph</span>
-          <span id="taskCountBadge" class="brand-tag">0 Tasks</span>
+        <div class="side-label">
+          <span>Task Pipeline</span>
+          <span id="taskCount">0</span>
         </div>
-
-        <div id="dagTaskList" class="task-graph-container">
-          <div class="empty-state">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-            <span>No active DAG pipeline. Submit a topic to trigger automated decomposition.</span>
-          </div>
+        <div id="taskList" class="task-rows">
+          <div class="note">No active tasks.</div>
         </div>
       </div>
 
-      <!-- Discovered Sources & Grounding Registry -->
       <div>
-        <div class="sidebar-section-title">
-          <span>Source Grounding Registry</span>
-          <span id="sourceCountBadge" class="brand-tag">0 Sources</span>
+        <div class="side-label">
+          <span>Sources</span>
+          <span id="sourceCount">0</span>
         </div>
-
-        <div id="sourceRegistryList" class="source-list">
-          <div class="empty-state">
-            <span>Sources with content SHA-256 hashes will appear here as agents extract evidence.</span>
-          </div>
+        <div id="sourceList" class="scroll-box">
+          <div class="note">Sources appear as retrieved.</div>
         </div>
       </div>
 
-      <!-- Past Research Sessions -->
       <div>
-        <div class="sidebar-section-title">
-          <span>Previous Sessions</span>
-          <button class="btn" style="padding: 2px 8px; font-size: 10px;" onclick="loadRecentJobs()">Refresh</button>
+        <div class="side-label">
+          <span>History</span>
+          <button class="btn" style="padding: 1px 5px; font-size: 9px;" onclick="loadHistory()">Refresh</button>
         </div>
-
-        <div id="recentJobsList" class="history-list">
-          <div class="empty-state">
-            <span>Loading past sessions...</span>
-          </div>
+        <div id="historyList" class="scroll-box">
+          <div class="note">Loading history...</div>
         </div>
       </div>
-
     </aside>
-
-  </main>
+  </div>
 
   <script>
-    // State Management
-    let currentJobId = null;
-    let currentEventSource = null;
-    let activeTasks = [];
-    let discoveredSources = [];
-    let currentReport = null;
-    let timerInterval = null;
-    let startTime = null;
+    // Automatic backend resolution: if loaded via VS Code Live Server (port 5500) or file://, route to :3000
+    const API_BASE = (window.location.port !== "3000" && window.location.port !== "") 
+      ? "http://localhost:3000" 
+      : (window.location.protocol === "file:" ? "http://localhost:3000" : "");
 
-    // Initialize application on load
+    let activeJobId = null;
+    let sse = null;
+    let clock = null;
+    let startTime = null;
+    let activeReport = null;
+
     document.addEventListener("DOMContentLoaded", () => {
-      loadRecentJobs();
+      loadHistory();
     });
 
-    function populatePrompt(text) {
-      const input = document.getElementById("researchTopicInput");
-      input.value = text;
-      input.focus();
+    function setPrompt(text) {
+      const el = document.getElementById("topicInput");
+      el.value = text;
+      el.focus();
     }
 
-    function handleInputKeydown(event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        submitResearchJob();
+    function onKey(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        runResearch();
       }
     }
 
-    function switchView(tab) {
-      const tabChat = document.getElementById("tabChatBtn");
-      const tabReport = document.getElementById("tabReportBtn");
-      const chatThread = document.getElementById("chatMessageThread");
-      const reportContainer = document.getElementById("reportMarkdownContainer");
+    function switchView(mode) {
+      const tabChat = document.getElementById("tabChat");
+      const tabReport = document.getElementById("tabReport");
+      const chatFlow = document.getElementById("chatFlow");
+      const reportFlow = document.getElementById("reportFlow");
       const reportActions = document.getElementById("reportActions");
 
-      if (tab === "chat") {
+      if (mode === "chat") {
         tabChat.classList.add("active");
         tabReport.classList.remove("active");
-        chatThread.classList.remove("hidden");
-        reportContainer.classList.add("hidden");
+        chatFlow.classList.remove("hidden");
+        reportFlow.classList.add("hidden");
         reportActions.classList.add("hidden");
       } else {
         tabReport.classList.add("active");
         tabChat.classList.remove("active");
-        chatThread.classList.add("hidden");
-        reportContainer.classList.remove("hidden");
-        if (currentReport) {
-          reportActions.classList.remove("hidden");
-        }
+        chatFlow.classList.add("hidden");
+        reportFlow.classList.remove("hidden");
+        if (activeReport) reportActions.classList.remove("hidden");
       }
     }
 
-    // Submit new research inquiry
-    async function submitResearchJob() {
-      const input = document.getElementById("researchTopicInput");
+    async function runResearch() {
+      const input = document.getElementById("topicInput");
       const topic = input.value.trim();
       if (!topic) return;
 
       input.value = "";
       input.blur();
 
-      // UI state transition
-      setEngineStatus("DEPLOYING AGENTS...", "active");
-      document.getElementById("submitJobBtn").disabled = true;
-      document.getElementById("cancelJobBtn").classList.remove("hidden");
+      setStatus("Planning", "live");
+      document.getElementById("runBtn").disabled = true;
+      document.getElementById("cancelBtn").classList.remove("hidden");
 
-      // Reset DAG and Telemetry for new job
-      resetTelemetry();
+      resetMetrics();
       switchView("chat");
+      appendUserCard(topic);
 
-      // Append user bubble to chat thread
-      appendUserMessage(topic);
-
-      // Start elapsed timer
       startTime = Date.now();
-      clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        const sec = ((Date.now() - startTime) / 1000).toFixed(1);
-        document.getElementById("statDuration").innerText = `${sec}s`;
+      clearInterval(clock);
+      clock = setInterval(() => {
+        document.getElementById("statDuration").innerText = `${((Date.now() - startTime) / 1000).toFixed(1)}s`;
       }, 100);
 
       try {
-        const res = await fetch("/research", {
+        const res = await fetch(`${API_BASE}/research`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ topic }),
         });
 
         const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || "Failed to submit research job");
-        }
+        if (!res.ok) throw new Error(data.error || "Request failed");
 
-        currentJobId = data.jobId;
-        document.getElementById("activeJobPill").classList.remove("hidden");
-        document.getElementById("activeJobIdText").innerText = currentJobId;
+        activeJobId = data.jobId;
+        document.getElementById("jobBadge").classList.remove("hidden");
+        document.getElementById("jobId").innerText = activeJobId;
 
-        // Open SSE connection to stream events
-        connectToJobStream(currentJobId);
+        openStream(activeJobId);
       } catch (err) {
-        clearInterval(timerInterval);
-        setEngineStatus("FAILED", "cancelled");
-        appendSystemLog(`Submission error: ${err.message}`, "cancel");
-        document.getElementById("submitJobBtn").disabled = false;
-        document.getElementById("cancelJobBtn").classList.add("hidden");
+        clearInterval(clock);
+        setStatus("Error", "cancelled");
+        appendStreamLog(`Failed: ${err.message}`);
+        document.getElementById("runBtn").disabled = false;
+        document.getElementById("cancelBtn").classList.add("hidden");
       }
     }
 
-    // Connect to Server-Sent Events stream for live progress
-    function connectToJobStream(jobId) {
-      if (currentEventSource) {
-        currentEventSource.close();
-      }
+    function openStream(jobId) {
+      if (sse) sse.close();
+      sse = new EventSource(`${API_BASE}/research/${jobId}/stream`);
 
-      currentEventSource = new EventSource(`/research/${jobId}/stream`);
-
-      currentEventSource.onmessage = (event) => {
+      sse.onmessage = (e) => {
         try {
-          const payload = JSON.parse(event.data);
-          handleStreamEvent(payload);
-        } catch (err) {
-          console.error("Malformed SSE event payload:", err);
-        }
+          handleEvent(JSON.parse(e.data));
+        } catch (err) {}
       };
 
-      currentEventSource.onerror = (err) => {
-        console.warn("SSE connection closed or lost. Falling back to poll.");
-        currentEventSource.close();
+      sse.onerror = () => {
+        sse.close();
       };
     }
 
-    // Process incoming live events
-    function handleStreamEvent(event) {
-      console.log("[SSE Event]", event.type, event);
+    function handleEvent(ev) {
+      if (ev.metrics) updateMetrics(ev.metrics);
 
-      // Update telemetry if present
-      if (event.metrics) {
-        updateTelemetryMetrics(event.metrics);
-      }
-
-      switch (event.type) {
+      switch (ev.type) {
         case "job.queued":
         case "research.started":
-          setEngineStatus("SUPERVISOR ACTIVE", "active");
-          updatePipelineStage("stage_queued");
+          setStatus("Running", "live");
           break;
 
         case "status.changed":
-          setEngineStatus(event.status.toUpperCase(), "active");
-          if (event.status === "planning") updatePipelineStage("stage_planning");
-          if (event.status === "researching") updatePipelineStage("stage_researching");
-          if (event.status === "synthesizing") updatePipelineStage("stage_synthesizing");
-          if (event.status === "verifying") updatePipelineStage("stage_verifying");
+          setStatus(cap(ev.status), "live");
           break;
 
         case "supervisor.plan_created":
-          updatePipelineStage("stage_planning");
-          activeTasks = event.tasks || [];
-          renderDagTasks(activeTasks);
-          appendAgentThoughtBubble(`Plan formulated with ${activeTasks.length} parallel specialized tasks.`);
+          renderTasks(ev.tasks || []);
+          appendStreamLog(`Formulated ${(ev.tasks || []).length} tasks`);
           break;
 
         case "task.settled":
-          updateTaskStatus(event.taskId, event.status, event.durationMs, event.evidenceCount);
-          appendSystemLog(`[${event.agentName}] Task ${event.taskId} settled (${event.status}) +${event.evidenceCount || 0} evidence`, "task");
-          // Re-fetch sources list
-          fetchJobDetails(currentJobId);
-          break;
-
-        case "coverage.assessed":
-          appendSystemLog(`Coverage assessed: ${event.completedTasks}/${event.totalTasks} tasks settled. Total evidence items: ${event.totalEvidence}`, "plan");
+          updateTask(ev.taskId, ev.status);
+          appendStreamLog(`${ev.agentName}: task ${ev.taskId} ${ev.status}`);
+          fetchSnapshot(activeJobId);
           break;
 
         case "verification.completed":
-          updatePipelineStage("stage_verifying");
-          if (event.verification) {
-            const prec = (event.verification.citationPrecision * 100).toFixed(0);
-            document.getElementById("statPrecision").innerText = `${prec}%`;
-            document.getElementById("statPrecisionSub").innerText = `${event.verification.supportedClaimsCount} / ${event.verification.totalClaimsAudited} claims verified`;
-            appendSystemLog(`Citation verification complete: ${prec}% precision score`, "verify");
+          if (ev.verification) {
+            const pct = (ev.verification.citationPrecision * 100).toFixed(0);
+            document.getElementById("statPrecision").innerText = `${pct}%`;
+            document.getElementById("statPrecisionSub").innerText = `${ev.verification.supportedClaimsCount}/${ev.verification.totalClaimsAudited} grounded`;
+            appendStreamLog(`Audit complete: ${pct}% precision`);
           }
           break;
 
         case "report.completed":
-          clearInterval(timerInterval);
-          updatePipelineStage("stage_completed");
-          setEngineStatus("RESEARCH COMPLETE", "idle");
-          document.getElementById("submitJobBtn").disabled = false;
-          document.getElementById("cancelJobBtn").classList.add("hidden");
+          clearInterval(clock);
+          setStatus("Completed", "done");
+          document.getElementById("runBtn").disabled = false;
+          document.getElementById("cancelBtn").classList.add("hidden");
 
-          if (event.report) {
-            currentReport = event.report;
-            renderReport(event.report);
-            appendAgentFinalReportBubble(event.report);
+          if (ev.report) {
+            activeReport = ev.report;
+            renderReport(ev.report);
+            appendDoneCard(ev.report);
           }
-          if (currentEventSource) {
-            currentEventSource.close();
-          }
-          loadRecentJobs();
+          if (sse) sse.close();
+          loadHistory();
           break;
 
         case "job.cancelled":
-          clearInterval(timerInterval);
-          setEngineStatus("CANCELLED", "cancelled");
-          document.getElementById("submitJobBtn").disabled = false;
-          document.getElementById("cancelJobBtn").classList.add("hidden");
-          appendSystemLog("Job execution halted by user request.", "cancel");
-          if (currentEventSource) {
-            currentEventSource.close();
-          }
-          loadRecentJobs();
+          clearInterval(clock);
+          setStatus("Cancelled", "cancelled");
+          document.getElementById("runBtn").disabled = false;
+          document.getElementById("cancelBtn").classList.add("hidden");
+          appendStreamLog("Job cancelled");
+          if (sse) sse.close();
+          loadHistory();
           break;
 
         case "job.error":
-          clearInterval(timerInterval);
-          setEngineStatus("EXECUTION ERROR", "cancelled");
-          document.getElementById("submitJobBtn").disabled = false;
-          document.getElementById("cancelJobBtn").classList.add("hidden");
-          appendSystemLog(`Error: ${event.error}`, "cancel");
-          if (currentEventSource) {
-            currentEventSource.close();
-          }
+          clearInterval(clock);
+          setStatus("Error", "cancelled");
+          document.getElementById("runBtn").disabled = false;
+          document.getElementById("cancelBtn").classList.add("hidden");
+          appendStreamLog(`Error: ${ev.error}`);
+          if (sse) sse.close();
           break;
       }
     }
 
-    async function cancelCurrentJob() {
-      if (!currentJobId) return;
+    async function cancelJob() {
+      if (!activeJobId) return;
       try {
-        await fetch(`/research/${currentJobId}/cancel`, { method: "POST" });
-        setEngineStatus("CANCELLING...", "cancelled");
-      } catch (err) {
-        console.error("Failed to cancel job:", err);
+        await fetch(`${API_BASE}/research/${activeJobId}/cancel`, { method: "POST" });
+        setStatus("Cancelling...", "cancelled");
+      } catch (err) {}
+    }
+
+    function setStatus(text, mode) {
+      document.getElementById("status").innerText = text;
+      const dot = document.getElementById("dot");
+      dot.className = "dot";
+      if (mode) dot.classList.add(mode);
+    }
+
+    function updateMetrics(m) {
+      if (!m) return;
+      document.getElementById("statTokens").innerText = (m.totalTokens || 0).toLocaleString();
+      document.getElementById("statTokensSplit").innerText = `${(m.totalInputTokens || 0).toLocaleString()} in / ${(m.totalOutputTokens || 0).toLocaleString()} out`;
+      document.getElementById("statCost").innerText = `$${(m.estimatedCostUsd || 0).toFixed(4)}`;
+      if (m.totalDurationMs) {
+        document.getElementById("statDuration").innerText = `${(m.totalDurationMs / 1000).toFixed(1)}s`;
       }
     }
 
-    // Telemetry updates
-    function updateTelemetryMetrics(metrics) {
-      if (!metrics) return;
-      document.getElementById("statTokens").innerText = (metrics.totalTokens || 0).toLocaleString();
-      document.getElementById("statTokensDetail").innerText = `${(metrics.totalInputTokens || 0).toLocaleString()} in / ${(metrics.totalOutputTokens || 0).toLocaleString()} out`;
-      document.getElementById("statCost").innerText = `$${(metrics.estimatedCostUsd || 0).toFixed(4)}`;
-      if (metrics.totalDurationMs) {
-        document.getElementById("statDuration").innerText = `${(metrics.totalDurationMs / 1000).toFixed(1)}s`;
-      }
-    }
-
-    function resetTelemetry() {
+    function resetMetrics() {
       document.getElementById("statTokens").innerText = "0";
-      document.getElementById("statTokensDetail").innerText = "0 in / 0 out";
+      document.getElementById("statTokensSplit").innerText = "0 in / 0 out";
       document.getElementById("statCost").innerText = "$0.000";
       document.getElementById("statDuration").innerText = "0.0s";
       document.getElementById("statPrecision").innerText = "100%";
-      document.getElementById("statPrecisionSub").innerText = "Level 1-5 Verified";
-      document.getElementById("dagTaskList").innerHTML = `
-        <div class="empty-state">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
-          <span>Decomposing topic into DAG task nodes...</span>
-        </div>`;
-      document.getElementById("pipelineTracker").classList.remove("hidden");
-      resetPipelineStages();
+      document.getElementById("statPrecisionSub").innerText = "Grounding";
+      document.getElementById("taskList").innerHTML = `<div class="note">Decomposing...</div>`;
+      document.getElementById("sourceList").innerHTML = `<div class="note">Collecting sources...</div>`;
     }
 
-    function setEngineStatus(label, type) {
-      const text = document.getElementById("engineStatusText");
-      const dot = document.getElementById("engineStatusDot");
-      text.innerText = label;
-      dot.className = "status-dot";
-      if (type === "active") dot.classList.add("active");
-      if (type === "cancelled") dot.classList.add("cancelled");
-    }
-
-    function resetPipelineStages() {
-      const stages = ["stage_queued", "stage_planning", "stage_researching", "stage_synthesizing", "stage_verifying", "stage_completed"];
-      stages.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.className = "stage-item";
-      });
-    }
-
-    function updatePipelineStage(activeStageId) {
-      const stages = ["stage_queued", "stage_planning", "stage_researching", "stage_synthesizing", "stage_verifying", "stage_completed"];
-      let passed = true;
-      stages.forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (id === activeStageId) {
-          el.className = "stage-item active";
-          passed = false;
-        } else if (passed) {
-          el.className = "stage-item completed";
-        } else {
-          el.className = "stage-item";
-        }
-      });
-    }
-
-    // Render DAG Task Nodes
-    function renderDagTasks(tasks) {
-      const container = document.getElementById("dagTaskList");
-      document.getElementById("taskCountBadge").innerText = `${tasks.length} Tasks`;
-
-      if (!tasks || tasks.length === 0) {
-        container.innerHTML = `<div class="empty-state"><span>No tasks generated.</span></div>`;
+    function renderTasks(tasks) {
+      const list = document.getElementById("taskList");
+      document.getElementById("taskCount").innerText = tasks.length;
+      if (!tasks || !tasks.length) {
+        list.innerHTML = `<div class="note">No tasks.</div>`;
         return;
       }
 
-      container.innerHTML = tasks.map(t => `
-        <div id="task_card_${t.id}" class="task-item ${t.status}">
-          <div class="task-header">
-            <span class="task-id-badge">${t.id}</span>
-            <span class="agent-pill ${t.assignedAgent}">${t.assignedAgent}</span>
-            <span id="task_status_${t.id}" class="task-status-pill ${t.status}">${t.status}</span>
+      list.innerHTML = tasks.map(t => `
+        <div id="task_${t.id}" class="task-r ${t.status}">
+          <div class="task-top">
+            <span style="font-weight: 500;">${t.id}</span>
+            <span style="color: var(--text-dim);">${t.assignedAgent}</span>
+            <span id="pill_${t.id}" class="task-pill ${t.status}">${t.status}</span>
           </div>
-          <div class="task-desc">${escapeHtml(t.question)}</div>
-          <div class="task-footer">
-            <span>${t.dependsOn && t.dependsOn.length > 0 ? `depends on: ${t.dependsOn.join(', ')}` : 'root node (parallel)'}</span>
-            <span id="task_meta_${t.id}"></span>
-          </div>
+          <div class="task-text">${esc(t.question)}</div>
         </div>
       `).join("");
     }
 
-    function updateTaskStatus(taskId, status, durationMs, evidenceCount) {
-      const card = document.getElementById(`task_card_${taskId}`);
-      const pill = document.getElementById(`task_status_${taskId}`);
-      const meta = document.getElementById(`task_meta_${taskId}`);
-
-      if (card) {
-        card.className = `task-item ${status}`;
-      }
+    function updateTask(id, status) {
+      const r = document.getElementById(`task_${id}`);
+      const pill = document.getElementById(`pill_${id}`);
+      if (r) r.className = `task-r ${status}`;
       if (pill) {
-        pill.className = `task-status-pill ${status}`;
+        pill.className = `task-pill ${status}`;
         pill.innerText = status;
       }
-      if (meta) {
-        meta.innerText = `${durationMs ? durationMs + 'ms' : ''} ${evidenceCount ? '· +' + evidenceCount + ' ev' : ''}`;
-      }
     }
 
-    // Render Discovered Sources
-    function renderSources(evidenceList) {
-      const container = document.getElementById("sourceRegistryList");
-      const badge = document.getElementById("sourceCountBadge");
-
-      if (!evidenceList || evidenceList.length === 0) {
-        badge.innerText = "0 Sources";
-        container.innerHTML = `<div class="empty-state"><span>No sources recorded yet.</span></div>`;
+    function renderSources(evidence) {
+      const list = document.getElementById("sourceList");
+      const count = document.getElementById("sourceCount");
+      if (!evidence || !evidence.length) {
+        count.innerText = "0";
+        list.innerHTML = `<div class="note">No sources yet.</div>`;
         return;
       }
 
-      // Deduplicate sources
-      const uniqueSources = new Map();
-      evidenceList.forEach(e => {
-        if (!uniqueSources.has(e.sourceId)) {
-          uniqueSources.set(e.sourceId, {
-            id: e.sourceId,
-            excerpt: e.excerpt,
-            claim: e.claim,
-          });
-        }
+      const map = new Map();
+      evidence.forEach(e => {
+        if (!map.has(e.sourceId)) map.set(e.sourceId, e);
       });
 
-      badge.innerText = `${uniqueSources.size} Sources`;
-
-      container.innerHTML = Array.from(uniqueSources.values()).map(s => `
-        <div class="source-card">
-          <div class="source-title" title="${escapeHtml(s.claim)}">${escapeHtml(s.claim)}</div>
-          <div style="font-size: 11px; color: var(--text-secondary); line-height: 1.3;">"${escapeHtml(s.excerpt.slice(0, 110))}..."</div>
-          <div class="source-meta">
-            <span class="source-hash">ID: ${s.id.slice(0, 16)}</span>
-            <span style="color: var(--accent-emerald);">● Level 3 Grounded</span>
+      count.innerText = map.size;
+      list.innerHTML = Array.from(map.values()).map(e => `
+        <div style="background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 5px 7px; font-size: 11px;">
+          <div style="color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${esc(e.claim)}</div>
+          <div style="font-family: var(--font-mono); font-size: 9px; color: var(--text-dim); display: flex; justify-content: space-between; margin-top: 2px;">
+            <span>${e.sourceId.slice(0, 14)}</span>
+            <span style="color: var(--emerald);">Grounded</span>
           </div>
         </div>
       `).join("");
     }
 
-    // Render Final Markdown Report
     function renderReport(report) {
-      const container = document.getElementById("reportMarkdownContainer");
-      if (!container || !report.markdown) return;
-
-      let html = marked.parse(report.markdown);
-
-      // Enhance citations [1], [2] with glowing pills
-      html = html.replace(/\[(\d+)\]/g, '<span class="cite-pill" onclick="switchView(\'report\')">[$1]</span>');
-
-      container.innerHTML = html;
+      const flow = document.getElementById("reportFlow");
+      if (!flow || !report.markdown) return;
+      flow.innerHTML = marked.parse(report.markdown);
       document.getElementById("reportActions").classList.remove("hidden");
     }
 
-    function appendUserMessage(text) {
-      const thread = document.getElementById("chatMessageThread");
-      const bubble = document.createElement("div");
-      bubble.className = "message-bubble";
-      bubble.innerHTML = `
-        <div class="avatar user">YOU</div>
-        <div class="message-body" style="background: var(--bg-card);">
-          <div class="message-meta">
-            <span>RESEARCH INQUIRY</span>
-            <span>${new Date().toLocaleTimeString()}</span>
-          </div>
-          <p style="color: #ffffff; font-weight: 500;">${escapeHtml(text)}</p>
+    function appendUserCard(text) {
+      const flow = document.getElementById("chatFlow");
+      const div = document.createElement("div");
+      div.className = "card user";
+      div.innerHTML = `
+        <div class="card-head">
+          <span>YOU</span>
+          <span>${new Date().toLocaleTimeString()}</span>
         </div>
+        <div>${esc(text)}</div>
       `;
-      thread.appendChild(bubble);
-      scrollToBottom();
+      flow.appendChild(div);
+      scroll();
     }
 
-    function appendAgentThoughtBubble(text) {
-      const thread = document.getElementById("chatMessageThread");
-      const bubble = document.createElement("div");
-      bubble.className = "message-bubble";
-      bubble.innerHTML = `
-        <div class="avatar assistant">B7</div>
-        <div class="message-body">
-          <div class="message-meta">
-            <span>SUPERVISOR THOUGHT STREAM</span>
-            <span>${new Date().toLocaleTimeString()}</span>
-          </div>
-          <p style="color: var(--text-secondary);">${escapeHtml(text)}</p>
-        </div>
-      `;
-      thread.appendChild(bubble);
-      scrollToBottom();
-    }
-
-    function appendSystemLog(msg, tag = "task") {
-      const thread = document.getElementById("chatMessageThread");
-      let lastBubble = thread.lastElementChild;
-      
-      let logBox = document.getElementById("activeLiveLogBox");
-      if (!logBox) {
-        const wrap = document.createElement("div");
-        wrap.className = "message-bubble";
-        wrap.innerHTML = `
-          <div class="avatar assistant">B7</div>
-          <div class="message-body">
-            <div class="message-meta">
-              <span>EXECUTION TELEMETRY STREAM</span>
-              <span>LIVE</span>
-            </div>
-            <div id="activeLiveLogBox" class="activity-log"></div>
-          </div>
+    function appendStreamLog(msg) {
+      let box = document.getElementById("logBox");
+      if (!box) {
+        const flow = document.getElementById("chatFlow");
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <div class="card-head"><span>STREAM</span></div>
+          <div id="logBox" class="stream"></div>
         `;
-        thread.appendChild(wrap);
-        logBox = document.getElementById("activeLiveLogBox");
+        flow.appendChild(div);
+        box = document.getElementById("logBox");
       }
 
       const row = document.createElement("div");
-      row.className = "log-row";
+      row.className = "stream-row";
       row.innerHTML = `
-        <span class="log-time">${new Date().toLocaleTimeString()}</span>
-        <span class="log-tag ${tag}">${tag}</span>
-        <span class="log-msg">${escapeHtml(msg)}</span>
+        <span class="t">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+        <span class="m">${esc(msg)}</span>
       `;
-      logBox.appendChild(row);
-      logBox.scrollTop = logBox.scrollHeight;
-      scrollToBottom();
+      box.appendChild(row);
+      box.scrollTop = box.scrollHeight;
+      scroll();
     }
 
-    function appendAgentFinalReportBubble(report) {
-      const thread = document.getElementById("chatMessageThread");
-      const bubble = document.createElement("div");
-      bubble.className = "message-bubble";
-      bubble.innerHTML = `
-        <div class="avatar assistant">B7</div>
-        <div class="message-body">
-          <div class="message-meta">
-            <span>SYNTHESIS COMPLETE · CITATION VERIFIED</span>
-            <span>${new Date().toLocaleTimeString()}</span>
-          </div>
-          <h3 style="color: #ffffff; margin-bottom: 8px;">${escapeHtml(report.topic)}</h3>
-          <p style="color: #d4d4d8; margin-bottom: 12px; font-size: 13px;">${escapeHtml(report.summary)}</p>
-          <div style="display: flex; gap: 8px;">
-            <button class="btn btn-primary" onclick="switchView('report')">
-              Read Full Verified Report
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-            </button>
-            <button class="btn" onclick="copyReportMarkdown()">Copy Markdown</button>
-          </div>
+    function appendDoneCard(report) {
+      const flow = document.getElementById("chatFlow");
+      const div = document.createElement("div");
+      div.className = "card";
+      div.innerHTML = `
+        <div class="card-head">
+          <span>REPORT READY</span>
+          <span>${new Date().toLocaleTimeString()}</span>
+        </div>
+        <p style="font-weight: 500; margin-bottom: 4px;">${esc(report.topic)}</p>
+        <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 8px;">${esc(report.summary)}</p>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-solid" onclick="switchView('report')">View Report</button>
+          <button class="btn" onclick="copyMarkdown()">Copy Markdown</button>
         </div>
       `;
-      thread.appendChild(bubble);
-      scrollToBottom();
+      flow.appendChild(div);
+      scroll();
     }
 
-    function scrollToBottom() {
-      const content = document.getElementById("workspaceContent");
-      content.scrollTop = content.scrollHeight;
+    function scroll() {
+      const vp = document.getElementById("viewport");
+      vp.scrollTop = vp.scrollHeight;
     }
 
-    // Fetch complete job details from server
-    async function fetchJobDetails(jobId) {
+    async function fetchSnapshot(jobId) {
       try {
-        const res = await fetch(`/research/${jobId}`);
+        const res = await fetch(`${API_BASE}/research/${jobId}`);
         if (!res.ok) return;
         const data = await res.json();
-        
-        if (data.tasks && data.tasks.length > 0) {
-          activeTasks = data.tasks;
-          renderDagTasks(data.tasks);
-        }
-
-        if (data.evidence && data.evidence.length > 0) {
-          renderSources(data.evidence);
-        }
-
+        if (data.evidence) renderSources(data.evidence);
+        if (data.tasks) renderTasks(data.tasks);
         if (data.report) {
-          currentReport = data.report;
+          activeReport = data.report;
           renderReport(data.report);
         }
-      } catch (err) {
-        console.warn("Error fetching job details:", err);
-      }
+      } catch (err) {}
     }
 
-    // Load recent sessions list
-    async function loadRecentJobs() {
+    async function loadHistory() {
       try {
-        const res = await fetch("/research");
+        const res = await fetch(`${API_BASE}/research`);
         if (!res.ok) return;
         const data = await res.json();
-        const list = document.getElementById("recentJobsList");
-
-        if (!data.jobs || data.jobs.length === 0) {
-          list.innerHTML = `<div class="empty-state"><span>No past research jobs found.</span></div>`;
+        const list = document.getElementById("historyList");
+        if (!data.jobs || !data.jobs.length) {
+          list.innerHTML = `<div class="note">No past sessions.</div>`;
           return;
         }
 
         list.innerHTML = data.jobs.slice(0, 10).map(j => `
-          <div class="history-card" onclick="loadPastSession('${j.id}')">
-            <div>
-              <div class="history-topic" title="${escapeHtml(j.topic)}">${escapeHtml(j.topic)}</div>
-              <div class="history-time">${new Date(j.createdAt).toLocaleDateString()} ${new Date(j.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-            </div>
-            <span class="task-status-pill ${j.status}">${j.status}</span>
+          <div class="hist-item" onclick="openSession('${j.id}')">
+            <span class="hist-topic" title="${esc(j.topic)}">${esc(j.topic)}</span>
+            <span class="task-pill ${j.status}">${j.status}</span>
           </div>
         `).join("");
-      } catch (err) {
-        console.warn("Failed to load recent jobs:", err);
-      }
+      } catch (err) {}
     }
 
-    async function loadPastSession(jobId) {
-      currentJobId = jobId;
-      document.getElementById("activeJobPill").classList.remove("hidden");
-      document.getElementById("activeJobIdText").innerText = currentJobId;
-      setEngineStatus("VIEWING ARCHIVE", "idle");
+    async function openSession(jobId) {
+      activeJobId = jobId;
+      document.getElementById("jobBadge").classList.remove("hidden");
+      document.getElementById("jobId").innerText = activeJobId;
+      setStatus("Archived", "done");
 
       try {
-        const res = await fetch(`/research/${jobId}`);
+        const res = await fetch(`${API_BASE}/research/${jobId}`);
         if (!res.ok) return;
         const data = await res.json();
 
-        if (data.job) {
-          appendUserMessage(data.job.topic);
-        }
-
-        if (data.tasks && data.tasks.length > 0) {
-          renderDagTasks(data.tasks);
-        }
-
-        if (data.evidence) {
-          renderSources(data.evidence);
-        }
-
+        if (data.job) appendUserCard(data.job.topic);
+        if (data.tasks) renderTasks(data.tasks);
+        if (data.evidence) renderSources(data.evidence);
         if (data.report) {
-          currentReport = data.report;
+          activeReport = data.report;
           renderReport(data.report);
-          appendAgentFinalReportBubble(data.report);
+          appendDoneCard(data.report);
           switchView("report");
         }
-
-        if (data.runs && data.runs.length > 0) {
-          const totalIn = data.runs.reduce((acc, r) => acc + (r.inputTokens || 0), 0);
-          const totalOut = data.runs.reduce((acc, r) => acc + (r.outputTokens || 0), 0);
-          const totalCost = data.runs.reduce((acc, r) => acc + parseFloat(r.estimatedCostUsd || 0), 0);
-          const totalDur = data.runs.reduce((acc, r) => acc + (r.durationMs || 0), 0);
-
-          updateTelemetryMetrics({
-            totalTokens: totalIn + totalOut,
-            totalInputTokens: totalIn,
-            totalOutputTokens: totalOut,
-            estimatedCostUsd: totalCost,
-            totalDurationMs: totalDur,
+        if (data.runs && data.runs.length) {
+          const inT = data.runs.reduce((a, r) => a + (r.inputTokens || 0), 0);
+          const outT = data.runs.reduce((a, r) => a + (r.outputTokens || 0), 0);
+          const cost = data.runs.reduce((a, r) => a + parseFloat(r.estimatedCostUsd || 0), 0);
+          const dur = data.runs.reduce((a, r) => a + (r.durationMs || 0), 0);
+          updateMetrics({
+            totalTokens: inT + outT,
+            totalInputTokens: inT,
+            totalOutputTokens: outT,
+            estimatedCostUsd: cost,
+            totalDurationMs: dur,
           });
         }
-      } catch (err) {
-        console.error("Error loading session:", err);
-      }
+      } catch (err) {}
     }
 
-    function copyReportMarkdown() {
-      if (!currentReport || !currentReport.markdown) return;
-      navigator.clipboard.writeText(currentReport.markdown).then(() => {
-        alert("Markdown report copied to clipboard!");
-      });
+    function copyMarkdown() {
+      if (!activeReport?.markdown) return;
+      navigator.clipboard.writeText(activeReport.markdown);
+      alert("Copied markdown to clipboard");
     }
 
-    function downloadReportMarkdown() {
-      if (!currentReport || !currentReport.markdown) return;
-      const blob = new Blob([currentReport.markdown], { type: "text/markdown" });
+    function downloadMarkdown() {
+      if (!activeReport?.markdown) return;
+      const blob = new Blob([activeReport.markdown], { type: "text/markdown" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `research_report_${currentJobId || "export"}.md`;
-      document.body.appendChild(a);
+      a.download = `report_${activeJobId || "export"}.md`;
       a.click();
-      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
 
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    function cap(s) {
+      if (!s) return "";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function esc(s) {
+      if (!s) return "";
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
   </script>
-
 </body>
 </html>
