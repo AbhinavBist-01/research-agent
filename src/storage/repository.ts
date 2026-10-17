@@ -117,6 +117,53 @@ export class ResearchRepository {
     return this.memJobs.get(jobId);
   }
 
+  async listJobs(): Promise<ResearchJob[]> {
+    if (this.db) {
+      try {
+        const rows = await this.db.select().from(schema.researchJobs);
+        return rows.map((r) => ({
+          id: r.id,
+          topic: r.topic,
+          scope: r.scope || undefined,
+          status: r.status as ResearchJob["status"],
+          deadlineAt: r.deadlineAt.toISOString(),
+          createdAt: r.createdAt.toISOString(),
+          taskIds: [],
+        })).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      } catch (e: any) {
+        console.warn(`[ResearchRepository] Postgres listJobs error: ${e.message}`);
+      }
+    }
+
+    return Array.from(this.memJobs.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  }
+
+  async getTasksForJob(jobId: string): Promise<ResearchTask[]> {
+    if (this.db) {
+      try {
+        const rows = await this.db.select().from(schema.researchTasks).where(eq(schema.researchTasks.jobId, jobId));
+        return rows.map((r) => ({
+          id: r.id,
+          jobId,
+          question: r.question,
+          assignedAgent: r.assignedAgent as any,
+          dependsOn: (r.dependsOn as string[]) || [],
+          status: r.status as any,
+          resultIds: [],
+        }));
+      } catch (e: any) {
+        console.warn(`[ResearchRepository] Postgres getTasks error: ${e.message}`);
+      }
+    }
+    return this.memTasks.get(jobId) || [];
+  }
+
+  async getEvidenceForJob(jobId: string): Promise<Evidence[]> {
+    return this.memEvidence.get(jobId) || [];
+  }
+
   async saveTasks(jobId: string, tasks: ResearchTask[]): Promise<void> {
     this.memTasks.set(jobId, [...tasks]);
 

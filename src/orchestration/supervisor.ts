@@ -71,14 +71,20 @@ export class Supervisor {
   async runJob(
     job: ResearchJob,
     tools: ToolRegistry,
-    store: EvidenceStore
+    store: EvidenceStore,
+    onProgress?: (event: any) => void
   ): Promise<{ report: ResearchReport; summary: TaskGraphSummary; tasks: ResearchTask[]; tracer: JobTracer }> {
     console.log(`\n================================================================`);
     console.log(`🧠 [Supervisor] Starting Job ${job.id}: "${job.topic}"`);
     console.log(`================================================================\n`);
 
     const tracer = new JobTracer(job.id);
+    const emitProgress = (type: string, data: any = {}) => {
+      onProgress?.({ type, jobId: job.id, timestamp: new Date().toISOString(), ...data, metrics: tracer.getMetrics() });
+    };
+
     tracer.emit("research.started", { metadata: { topic: job.topic } });
+    emitProgress("research.started", { topic: job.topic, status: job.status });
 
     // Set up cancellation controller
     const abortController = new AbortController();
@@ -90,12 +96,14 @@ export class Supervisor {
     // Stage 1: Planning & Task Decomposition
     job.status = "planning";
     await this.repository.updateJobStatus(job.id, "planning");
+    emitProgress("status.changed", { status: "planning" });
 
     const plan = await this.planner.createPlan(job);
     job.taskIds = plan.tasks.map((t) => t.id);
     await this.repository.saveTasks(job.id, plan.tasks);
 
     tracer.emit("supervisor.plan_created", { metadata: { taskCount: plan.tasks.length } });
+    emitProgress("supervisor.plan_created", { tasks: plan.tasks });
 
     console.log(`[Supervisor] Plan generated with ${plan.tasks.length} specialized tasks:`);
     for (const t of plan.tasks) {
@@ -105,6 +113,7 @@ export class Supervisor {
     // Stage 2: Parallel Task Execution via DAG Scheduler with Retries
     job.status = "researching";
     await this.repository.updateJobStatus(job.id, "researching");
+    emitProgress("status.changed", { status: "researching" });
 
     const graphSummary = await executeTaskGraph({
       jobId: job.id,
@@ -158,6 +167,14 @@ export class Supervisor {
           tokens: { input: 500 * attempts, output: 250 * attempts },
         });
 
+        emitProgress("task.settled", {
+          taskId: task.id,
+          agentName: task.assignedAgent,
+          status: result.status,
+          durationMs: duration,
+          evidenceCount: result.evidenceCount,
+        });
+
         return result;
       },
     });
@@ -167,6 +184,7 @@ export class Supervisor {
       job.status = "cancelled";
       await this.repository.updateJobStatus(job.id, "cancelled");
       tracer.emit("job.cancelled");
+      emitProgress("job.cancelled");
       throw new Error(`Job ${job.id} was cancelled.`);
     }
 
@@ -183,6 +201,11 @@ export class Supervisor {
     console.log(`\n[Supervisor] Coverage Assessment:`);
     console.log(` • Tasks Completed: ${graphSummary.completedTasks.length}/${graphSummary.totalTasks}`);
     console.log(` • Total Evidence Items: ${totalEvidence}`);
+    emitProgress("coverage.assessed", {
+      completedTasks: graphSummary.completedTasks.length,
+      totalTasks: graphSummary.totalTasks,
+      totalEvidence,
+    });
 
     if (graphSummary.failedTasks.length > 0) {
       console.warn(` • ⚠️ Partial failures detected on tasks: ${graphSummary.failedTasks.join(", ")}`);
@@ -192,6 +215,7 @@ export class Supervisor {
     job.status = "synthesizing";
     await this.repository.updateJobStatus(job.id, "synthesizing");
     tracer.emit("synthesis.started");
+    emitProgress("status.changed", { status: "synthesizing" });
 
     console.log(`[Supervisor] Triggering Grounded Synthesis...`);
     const report = await this.synthesizer.synthesize(job.id, job.topic, store);
@@ -200,6 +224,7 @@ export class Supervisor {
     job.status = "verifying";
     await this.repository.updateJobStatus(job.id, "verifying");
     tracer.emit("citation.checked");
+    emitProgress("status.changed", { status: "verifying" });
 
     console.log(`[Supervisor] 🛡️ Running 5-Level Citation Verification Pipeline...`);
 
@@ -221,6 +246,7 @@ export class Supervisor {
     );
 
     report.claims = verification.verifiedClaims;
+    emitProgress("verification.completed", { verification });
 
     // Append Verification Audit, Cost Telemetry & Multi-Agent Telemetry to Markdown
     report.markdown += `\n\n## Citation Verification Audit\n`;
@@ -257,6 +283,12 @@ export class Supervisor {
     await this.repository.saveReport(report, verification.citationPrecision * 100);
 
     tracer.emit("report.completed");
+    emitProgress("report.completed", {
+      report,
+      metrics,
+      summary: graphSummary,
+    });
+
     this.activeCancellations.delete(job.id);
 
     return {
